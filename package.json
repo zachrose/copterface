@@ -1,0 +1,26 @@
+{
+  "name": "copterface",
+  "version": "0.1.7",
+  "description": "Attempts to position an ar-drone so that is center any face detected using opencv in the center of it's field of vision.",
+  "main": "app.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachrose/copterface.git"
+  },
+  "keywords": [
+    "ar-drone",
+    "opencv"
+  ],
+  "author": "Paul Hayes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zachrose/copterface/issues"
+  },
+  "dependencies": {
+    "ar-drone": "~0.3.1",
+    "opencv": "~0.5.0"
+  }
+}
