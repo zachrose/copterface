@@ -24,7 +24,7 @@ var time = ( ( new Date().getTime() - startTime ) / 1000 ).toFixed(2);
 pngStream
   .on('error', console.log)
   .on('data', function(pngBuffer) {
-    //console.log("got image");
+    console.log("got image");
     lastPng = pngBuffer;
   });
      
@@ -32,6 +32,7 @@ pngStream
       if( ! flying ) return;
       if( ( ! processingImage ) && lastPng )
       {
+        console.log("yay");
         processingImage = true;
         cv.readImage( lastPng, function(err, im) {
           var opts = {};
@@ -42,15 +43,20 @@ pngStream
 
             for(var k = 0; k < faces.length; k++) {
               face = faces[k];
-
+              
+              
+              im.ellipse(face.x, face.y, face.width, face.height);
+              
               if( !biggestFace || biggestFace.width < face.width ) biggestFace = face;
 
               //im.rectangle([face.x, face.y], [face.x + face.width, face.y + face.height], [0, 255, 0], 2);
             }
+            
+            im.save('./out'+Date.now()+'.png'); 
 
             if( biggestFace ){
               face = biggestFace;
-              console.log( face.x, face.y, face.width, face.height, im.width(), im.height() );
+              console.log("GOT A FACE", face.x, face.y, face.width, face.height, im.width(), im.height() );
 
               face.centerX = face.x + face.width * 0.5;
               face.centerY = face.y + face.height * 0.5;
@@ -107,40 +113,43 @@ pngStream
 
 var faceInterval = setInterval( detectFaces, 150);
 
-client.takeoff();
-client.after(5000,function(){ 
-  log("going up");
-  this.up(1);
-}).after(1000,function(){ 
-  log("stopping");
-  this.stop(); 
-  flying = true;
-});
-
-
-client.after(60000, function() {
+var fly = false;
+if(fly){
+  client.takeoff();
+  client.after(5000,function(){ 
+    log("going up");
+    this.up(1);
+  }).after(1000,function(){ 
+    log("stopping");
+    this.stop(); 
+    flying = true;
+  }).after(60000, function() {
     flying = false;
     this.stop();
     this.land();
   });
+}else{
+  flying = true;
+}
 
 client.on('navdata', function(navdata) {
   navData = navdata;
-})
-
-
-var server = http.createServer(function(req, res) {
-  if (!lastPng) {
-    res.writeHead(503);
-    res.end('Did not receive any png data yet.');
-    return;
-  }
-
-  res.writeHead(200, {'Content-Type': 'image/png'});
-  res.end(lastPng);
 });
 
-server.listen(8080, function() {
-  console.log('Serving latest png on port 8080 ...');
-});
+(function(){
+  var http = require('http');
+  http.createServer(function(req, res) {
+    if (!lastPng) {
+      res.writeHead(503);
+      res.end('Did not receive any png data yet.');
+      return;
+    }
+    
+    res.writeHead(200, {'Content-Type': 'image/png'});
+    res.end(lastPng);
+  }).listen(1338, '127.0.0.1');
+  console.log('Server running at http://127.0.0.1:1338/');
+})();
+
+
 

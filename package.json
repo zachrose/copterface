@@ -4,6 +4,7 @@
   "description": "Attempts to position an ar-drone so that is center any face detected using opencv in the center of it's field of vision.",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "./node_modules/.bin/mocha"
   },
   "repository": {
